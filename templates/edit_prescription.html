@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header text-white text-center" style="background-color: rgb(33, 37, 41);">
+                    <h4>Edit Prescription</h4>
+                </div>
+                <div class="card-body" style="background-color: rgb(44, 48, 52);">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+
+                        <div class="form-group">
+                            <label for="medication" class="text-white">Medication</label>
+                            {{ form.medication(class="form-control", id="medication", placeholder="Enter medication") }}
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="dosage" class="text-white">Dosage</label>
+                            {{ form.dosage(class="form-control", id="dosage", placeholder="Enter dosage") }}
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn" style="background-color: orange; color: white;">Update</button>
+                            <a href="{{ url_for('view_patient', patient_id=prescription.patient_id) }}" class="btn btn-danger ml-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

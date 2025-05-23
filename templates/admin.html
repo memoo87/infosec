@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel - SecureHealth{% endblock %}
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-md-12">
+            <div class="card animate_animated animate_fadeIn" style="background: rgba(56, 100, 102, 0.2); backdrop-filter: blur(10px); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <div class="card-header text-center p-4" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: rgba(68, 209, 194, 0.1);">
+                    <h2 class="text-white mb-2">Admin Panel</h2>
+                    <p class="text-white-50">Manage users, permissions, and database</p>
+                </div>
+                <div class="card-body p-4">
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-success mb-3">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <!-- Add User Form -->
+                    <h4>Add New User</h4>
+                    <form method="POST" action="{{ url_for('manage_users') }}" class="needs-validation mb-5" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+                        <input type="hidden" name="action" value="add_user">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="add-username" class="form-label">Username</label>
+                                <input type="text" id="add-username" class="form-control bg-dark text-white" name="username" placeholder="Username" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="add-email" class="form-label">Email</label>
+                                <input type="email" id="add-email" class="form-control bg-dark text-white" name="email" placeholder="Email" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="add-name" class="form-label">Full Name</label>
+                                <input type="text" id="add-name" class="form-control bg-dark text-white" name="name" placeholder="Full Name" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="add-password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <input type="password" id="add-password" class="form-control bg-dark text-white" name="password" placeholder="Password" required>
+                                    <span class="input-group-text" style="cursor:pointer; background: linear-gradient(90deg, var(--primary-teal), var(--secondary-blue)); border: none;" onclick="togglePassword('add-password', this)">
+                                        <i class='bx bx-show'></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="add-role" class="form-label">Role</label>
+                                <select class="form-control bg-dark text-white" id="add-role" name="role" required>
+                                    <option value="Patient">Patient</option>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Add User</button>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- User List -->
+                    <h4>User Management</h4>
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Permissions</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                                <tr>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.name }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('manage_users') }}" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+                                            <input type="hidden" name="action" value="change_role">
+                                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                                            <select name="role" onchange="this.form.submit()" class="form-control bg-dark text-white d-inline w-auto">
+                                                <option value="Patient" {% if user.role == 'Patient' %}selected{% endif %}>Patient</option>
+                                                <option value="Doctor" {% if user.role == 'Doctor' %}selected{% endif %}>Doctor</option>
+                                                <option value="Admin" {% if user.role == 'Admin' %}selected{% endif %}>Admin</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('manage_users') }}" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+                                            <input type="hidden" name="action" value="toggle_active">
+                                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                                            {% if user.is_active %}
+                                                <button type="submit" class="btn btn-success btn-sm">Active</button>
+                                            {% else %}
+                                                <button type="submit" class="btn btn-secondary btn-sm">Inactive</button>
+                                            {% endif %}
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('manage_users') }}" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+                                            <input type="hidden" name="action" value="change_permission">
+                                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                                            <select name="permission" onchange="this.form.submit()" class="form-control bg-dark text-white d-inline w-auto">
+                                                <option value="read" {% if user.permission == 'read' %}selected{% endif %}>Read</option>
+                                                <option value="write" {% if user.permission == 'write' %}selected{% endif %}>Write</option>
+                                                <option value="full" {% if user.permission == 'full' %}selected{% endif %}>Full</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('manage_users') }}" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <!-- Database Management -->
+                    <h4>Database Management</h4>
+                    <div class="mb-4">
+                        <a href="{{ url_for('admin_table', table='user') }}" class="btn btn-secondary btn-sm">Manage Users Table</a>
+                        <a href="{{ url_for('admin_table', table='patient') }}" class="btn btn-secondary btn-sm">Manage Patients Table</a>
+                        <a href="{{ url_for('admin_table', table='appointment') }}" class="btn btn-secondary btn-sm">Manage Appointments Table</a>
+                        <a href="{{ url_for('admin_table', table='prescription') }}" class="btn btn-secondary btn-sm">Manage Prescriptions Table</a>
+                        <a href="{{ url_for('admin_table', table='diagnosis') }}" class="btn btn-secondary btn-sm">Manage Diagnoses Table</a>
+                        <a href="{{ url_for('admin_table', table='audit_log') }}" class="btn btn-secondary btn-sm">Manage Audit Logs Table</a>
+                    </div>
+                    <!-- Logs -->
+                    <h4>Audit Logs</h4>
+                    <div class="mb-3">
+                        <a href="{{ url_for('export_logs') }}" class="btn btn-primary btn-sm">Download Logs (CSV)</a>
+                        <a href="{{ url_for('export_logs', format='log') }}" class="btn btn-secondary btn-sm">Download Logs (LOG)</a>
+                    </div>
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Timestamp</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.id }}</td>
+                                    <td>{{ log.user_id }}</td>
+                                    <td>{{ log.action }}</td>
+                                    <td>{{ log.timestamp }}</td>
+                                    <td>{{ log.details }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+        if (typeof gsap !== 'undefined') {
+            gsap.from('.card', { y: 30, opacity: 0, duration: 1, ease: 'power3.out' });
+        }
+    });
+
+    function togglePassword(inputId, iconSpan) {
+        const input = document.getElementById(inputId);
+        const icon = iconSpan.querySelector('i');
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove('bx-show');
+            icon.classList.add('bx-hide');
+        } else {
+            input.type = "password";
+            icon.classList.remove('bx-hide');
+            icon.classList.add('bx-show');
+        }
+    }
+</script>
+{% endblock %}

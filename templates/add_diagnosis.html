@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Add Diagnosis - SecureHealth{% endblock %}
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card animate_animated animate_fadeIn" style="background: rgba(56, 100, 102, 0.2); backdrop-filter: blur(10px); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);">
+                <div class="card-header text-center p-4" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: rgba(68, 209, 194, 0.1); border-radius: 15px 15px 0 0;">
+                    <div class="avatar-container mb-3">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-teal), var(--secondary-blue)); border-radius: 50%; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+                            <i class='bx bx-file' style="font-size: 2.5rem; color: var(--white);"></i>
+                        </div>
+                    </div>
+                    <h2 class="text-white mb-2">Add Diagnosis</h2>
+                    <p class="text-white-50">Record a diagnosis for the patient</p>
+                    {% if patient_id %}
+                        <p class="text-info">Patient ID: {{ patient_id }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4">
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-success mb-3">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <form method="POST" action="{{ url_for('add_diagnosis', patient_id=patient_id) }}" class="needs-validation" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+                        <div class="mb-3">
+                            <label for="diagnosis" class="form-label">Diagnosis</label>
+                            <textarea class="form-control bg-dark text-white" name="diagnosis" required style="border: 1px solid rgba(16, 170, 197, 0.3);"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control bg-dark text-white" name="notes" style="border: 1px solid rgba(16, 170, 197, 0.3);"></textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-lg" style="background: linear-gradient(90deg, var(--primary-teal), var(--secondary-blue)); border: none; border-radius: 10px; height: 48px;">
+                                <i class='bx bx-check-circle me-2'></i>Add Diagnosis
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+        if (typeof gsap !== 'undefined') {
+            gsap.from('.card', { y: 30, opacity: 0, duration: 1, ease: 'power3.out' });
+            gsap.from('.avatar-container', { scale: 0.5, opacity: 0, duration: 0.8, delay: 0.3, ease: 'back.out(1.7)' });
+        }
+    });
+</script>
+{% endblock %}

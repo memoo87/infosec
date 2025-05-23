@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Edit Record - {{ table|capitalize }}{% endblock %}
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card animate_animated animate_fadeIn">
+                <div class="card-header text-center p-4">
+                    <h2 class="text-white mb-2">Edit {{ table|capitalize }}</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+                        {% if table == 'user' %}
+                            <div class="mb-3">
+                                <label>Username</label>
+                                <input type="text" name="username" class="form-control" value="{{ record.username }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Email</label>
+                                <input type="email" name="email" class="form-control" value="{{ record.email }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Name</label>
+                                <input type="text" name="name" class="form-control" value="{{ record.name }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>New Password (leave blank to keep current)</label>
+                                <input type="password" name="password" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label>Role</label>
+                                <select name="role" class="form-control" required>
+                                    <option value="Patient" {% if record.role == 'Patient' %}selected{% endif %}>Patient</option>
+                                    <option value="Doctor" {% if record.role == 'Doctor' %}selected{% endif %}>Doctor</option>
+                                    <option value="Admin" {% if record.role == 'Admin' %}selected{% endif %}>Admin</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Permission</label>
+                                <select name="permission" class="form-control" required>
+                                    <option value="read" {% if record.permission == 'read' %}selected{% endif %}>Read</option>
+                                    <option value="write" {% if record.permission == 'write' %}selected{% endif %}>Write</option>
+                                    <option value="full" {% if record.permission == 'full' %}selected{% endif %}>Full</option>
+                                </select>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" name="is_active" class="form-check-input" {% if record.is_active %}checked{% endif %}>
+                                <label class="form-check-label">Active</label>
+                            </div>
+                        {% else %}
+                            <div class="mb-3">
+                                <p>Edit not implemented for this table.</p>
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a href="{{ url_for('admin_table', table=table) }}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

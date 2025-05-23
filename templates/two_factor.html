@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Two-Factor Authentication - SecureDocs{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card animate_animated animate_fadeIn" style="background: rgba(56, 100, 102, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class='bx bx-shield-quarter' style="font-size: 3rem; color: var(--primary-teal);"></i>
+                        <h1 class="mt-3">Two-Factor Authentication</h1>
+                        {% if reset_password %}
+                        <p class="lead">Please verify your identity to reset your password.</p>
+                        {% else %}
+                        <p class="lead">Scan the QR code with your Google Authenticator app to set up 2FA.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <div class="qr-container p-3 mx-auto" style="background: white; width: fit-content; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <img src="/{{ qr_path }}" alt="2FA QR Code" class="img-fluid" style="max-width: 200px;">
+                        </div>
+                    </div>
+
+                    <div class="setup-instructions mb-4">
+                        <h4><i class='bx bx-info-circle me-2' style="color: var(--primary-teal);"></i>Setup Instructions</h4>
+                        <ol class="mt-3">
+                            <li class="mb-2">Download the Google Authenticator app if you don't have it.</li>
+                            <li class="mb-2">Open the app and tap "+" to add a new account.</li>
+                            <li class="mb-2">Scan the QR code above.</li>
+                            <li class="mb-2">Enter the 6-digit code from the app below.</li>
+                        </ol>
+                    </div>
+
+                    <form action="{{ url_for('two_factor') }}" method="POST" class="animate_animated animate_fadeIn">
+                        <input type="hidden" name="csrf_token" value="{{ session.get('csrf_token', '') }}">
+                        <input type="hidden" name="username" value="{{ username }}">
+                        <div class="mb-4">
+                            <label for="otp" class="form-label">
+                                <i class='bx bx-key me-2' style="color: var(--primary-teal);"></i>Enter 6-digit Code
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="otp" name="otp" required placeholder="000000" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
+                                <span class="input-group-text" style="background: rgba(68, 209, 194, 0.2); border: 1px solid rgba(68, 209, 194, 0.3);">
+                                    <i class='bx bx-lock-alt'></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" style="background-color: var(--primary-teal); border: none;">
+                                <i class='bx bx-check-circle me-2'></i>Verify & Continue
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

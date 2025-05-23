@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Add Record - {{ table|capitalize }}{% endblock %}
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card animate_animated animate_fadeIn">
+                <div class="card-header text-center p-4">
+                    <h2 class="text-white mb-2">Add {{ table|capitalize }}</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+                        {% if table == 'user' %}
+                            <div class="mb-3">
+                                <label>Username</label>
+                                <input type="text" name="username" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Email</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Name</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Password</label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Role</label>
+                                <select name="role" class="form-control" required>
+                                    <option value="Patient">Patient</option>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Permission</label>
+                                <select name="permission" class="form-control" required>
+                                    <option value="read">Read</option>
+                                    <option value="write">Write</option>
+                                    <option value="full">Full</option>
+                                </select>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" name="is_active" class="form-check-input" checked>
+                                <label class="form-check-label">Active</label>
+                            </div>
+                        {% else %}
+                            <div class="mb-3">
+                                <p>Adding not implemented for this table.</p>
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Add</button>
+                        <a href="{{ url_for('admin_table', table=table) }}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
